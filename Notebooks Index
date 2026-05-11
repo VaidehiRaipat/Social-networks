@@ -1,0 +1,265 @@
+# Notebook index
+
+## R8_1-CO_Weekly_adjacency_matrix.ipynb
+
+Builds the Colorado R11 third-place co-location network pipeline. It turns daily Cuebiq/Spectus stop records into daily user-user co-presence JSON files, aggregates daily ties into monthly POI-weighted dyadic JSONs, converts monthly JSONs into NetworkX graphs, and computes network summaries and centralities for pre- and post-disaster months.
+
+**Inputs**
+- Cuebiq/Spectus daily stop files: `../Data/stop_df_perday_CO/daily_agg_to_weekly_Stops/{phase}/{week}/stop_df_{YYYYMMDD}`
+- Cleaned third-place POI polygons: `../Data/stop_df_perday_CO/POIs/CO_pois_TP.csv`
+- Home CBG files under `../Data/stop_df_perday_CO/home/{phase}/freq_home_*`
+- Month/week/date definitions for Oct2021, Nov2021, Jan2022, and Feb2022
+- Python helpers:
+  - `R11_colocation_function.py`
+  - `R_monthly_poi_aggregation.py`
+  - `build_monthly_graphs_universal.py`
+
+**Outputs**
+- Daily adjacency JSON files: `../Data/stop_df_perday_CO/daily_agg_to_weekly_Stops/{phase}/{week}/for_AM_{YYYYMMDD}_R11.json`
+- Monthly POI-weighted co-location JSON files under the monthly stop folders
+- Monthly NetworkX graph pickles: `../Data/stop_df_perday_CO/graphs_POI_weighted/*_graph_POI_weighted_R11.pkl`
+- Remaining-pre-users post-disaster graph pickles used for downstream comparison
+- Network-level metric tables: `network_metrics_POI_weighted_R11.csv`
+- Node/network centrality tables:
+  - `node_metrics_centrality_POI_weighted_R11.csv`
+  - `network_centrality_POI_weighted_R11.csv`
+
+---
+
+## R8_2-CO_Randomremoval_interaction.ipynb
+
+Prepares the evacuation-controlled random survival baseline at the interaction level. It aligns observed dyadic interactions with evacuation status, home CBG information, and POI information. It then creates CBG-stratified random removal/survivor samples and prepares random-survival interaction and POI-level outputs for comparison with the observed post-disaster network.
+
+**Inputs**
+- Dyadic interaction table: `../Data/stop_df_perday_CO/for_ABM/individual_interac_allusers_{revision}.csv`
+- User evacuation file: `../Data/stop_df_perday_CO/graphs_POI_weighted/user_evacuations/user_evacuations_{revision}.csv`
+- Home CBG files under `../Data/stop_df_perday_CO/home/`
+- Observed pre/post graph pickles under `../Data/stop_df_perday_CO/graphs_POI_weighted/`
+- Census/CBG demographic files used for CBG-level matching
+- Cleaned POI data used to attach POI attributes
+
+**Outputs**
+- Aligned dyad table: `../Data/stop_df_perday_CO/for_ABM/individual_interac_allusers_{revision}_aligned.csv`
+- Random removed-user lists under: `graphs_POI_weighted/boots_user_removal/{revision}/`
+- Random survivor lists under: `graphs_POI_weighted/boots_user_survivors/{revision}/`
+- Random-survival interaction tables
+- Random-survival POI aggregation tables and delta/residual preparation files
+
+---
+
+## R8_3-CO_Randomgraph.ipynb
+
+Builds and evaluates random survival-only graph baselines from the survivor lists created in the random-removal workflow. The notebook loads observed pre/post graphs, induces random-survival graphs from the pre-disaster graph using sampled survivors, computes graph-level and node-level metrics, and combines these metrics with observed pre/post network summaries.
+
+**Inputs**
+- Observed pre-disaster graph pickle: `PDM_Oct2021_graph_POI_weighted_{revision}.pkl`
+- Observed post-disaster remaining-pre-users graph pickle: `Jan2022_remaining_pre_users_graph_POI_weighted_{revision}.pkl`
+- Random survivor JSON files: `graphs_POI_weighted/boots_user_survivors/{revision}/survivors_run*.json`
+- Observed network metric tables from R8_1
+
+**Outputs**
+- Random survival-only graph pickles saved under:
+  - `graphs_POI_weighted/boots_user_survivors/{revision}/CF_graph_run{run:04d}_Oct2021_{revision}.pkl`
+- Random survival network metric table:
+  - `CF_network_metrics_Oct2021_{revision}.csv`
+- Combined observed + random-survival network metrics:
+  - `all_network_metrics_Oct2021_{revision}.csv`
+- Random-survival node metrics:
+  - `cf_node_metrics_{revision}.csv`
+- Random-survival network metrics:
+  - `cf_network_metrics_{revision}.csv`
+- Combined observed + random-survival node centralities:
+  - `combined_node_centralities_{revision}.csv`
+
+**Important naming note**
+Some files use the prefix `CF_`, but in this notebook `CF` refers to the random survival-only null graph. These are not behavior-informed counterfactuals.
+
+---
+
+## R8_4-CO_centralities_exploration.ipynb
+
+Explores node-level centrality distributions for observed and random-survival Colorado networks. It loads or computes degree, weighted degree/strength, clustering, closeness, and related graph summaries to compare pre-disaster, post-disaster, and random-survival baseline networks.
+
+**Inputs**
+- Observed graph pickles under `../Data/stop_df_perday_CO/graphs_POI_weighted/`
+- Random survival graph pickles and survivor outputs under `graphs_POI_weighted/boots_user_survivors/{revision}/`
+- Network metric CSVs generated by R8_1 and R8_3
+- User evacuation and census/home CBG tables where needed for interpretation
+
+**Outputs**
+- Combined node centrality tables
+- User centrality + evacuation + census merged tables
+- Exploratory plots of centrality distributions and pre/post/random comparisons
+
+---
+
+## R8_4-CO_explaining_centralities.ipynb
+
+Analyzes and visualizes centrality outputs for interpretation. It loads centrality tables, merges them with evacuation/home/census information, and creates exploratory plots used to explain how network position relates to evacuation and post-disaster network change.
+
+**Inputs**
+- Centrality CSVs generated by earlier graph notebooks
+- User evacuation files
+- Home CBG and census demographic data
+- Python helpers, where used:
+  - `extract_model_results.py`
+  - `plot_regression_models.py`
+
+**Outputs**
+- Merged user centrality, evacuation, and census tables
+- Exploratory centrality plots
+- Interpretation-ready figures for network mechanism discussion
+
+---
+
+## R8_5-CO_behaviorbased.ipynb
+
+Builds the behavior-informed evacuation/survival counterfactual workflow. It merges network position, mobility behavior, distance, evacuation, and demographic features; estimates behavior-informed evacuation/survival probabilities; samples survivors using these predicted probabilities while respecting CBG-level survivor counts; builds behavior-informed counterfactual graphs; and computes graph/node metrics.
+
+**Inputs**
+- Observed graph pickles under `../Data/stop_df_perday_CO/graphs_POI_weighted/`
+- User evacuation labels
+- Home CBG and census demographic attributes
+- User-level network centralities from earlier notebooks
+- Mobility behavior variables such as entropy, exploration, repeat visitation, and travel distance
+- Random-survival baseline outputs where needed for comparison
+
+**Outputs**
+- Behavior-informed user feature table:
+  - `user_level_feature_table_yhat_{revision}_counts.csv`
+- Behavior-informed removed-user and survivor JSON files saved under:
+  - `graphs_POI_weighted/boots_user_removal_weighted_yhat_count/{revision}/`
+- Behavior-informed graph pickles:
+  - `CF_graph_run{run:04d}_Oct2021_{revision}.pkl`
+- Behavior-informed network metric files:
+  - `CF_network_metrics_Oct2021_yhat_{revision}_count.csv`
+  - `cf_network_metrics_{revision}_yhat.csv`
+- Behavior-informed node metric files:
+  - `cf_node_metrics_{revision}_yhat.csv`
+  - `combined_node_centralities_{revision}_with_yhat.csv`
+
+**Important naming note**
+The behavior-informed graph files also use the prefix `CF_graph`, but they are distinguished from the random-survival graphs by their directory: `boots_user_removal_weighted_yhat_count/{revision}/`.
+
+---
+
+## R8_6-CO_behaviorbased_interaction.ipynb
+
+Extends the behavior-informed workflow to interaction-level and POI-level comparisons. It aligns dyadic interaction records with behavior-informed survivor/removal outputs and prepares behavior-informed interaction and POI-level counterfactual tables.
+
+**Inputs**
+- Aligned dyad interactions: `individual_interac_allusers_{revision}_aligned.csv`
+- Behavior-informed user prediction/survivor outputs from R8_5
+- Observed graph pickles
+- Home CBG and census demographic data
+- POI attributes and POI-level interaction inputs
+
+**Outputs**
+- Behavior-informed survivor/removal files where regenerated
+- Behavior-informed counterfactual interaction tables
+- Behavior-informed POI aggregation and delta/residual preparation files
+- POI-level comparison tables used by later POI change notebooks
+
+---
+
+## R8_7_CO_poilevel_changein_connections.ipynb
+
+Aggregates user-user co-location ties to the POI level and estimates POI-specific post-disaster changes relative to random and behavior-informed baselines. It computes POI-level interaction counts, residuals, z-scores, and regression-ready tables.
+
+**Inputs**
+- Observed and counterfactual interaction tables
+- Daily/monthly co-location JSONs and monthly graph outputs
+- Cleaned POI table: `CO_pois_TP.csv`
+- POI CBG/census covariates
+- POI fire-distance variables
+- User evacuation outputs
+- Python helper where relevant:
+  - `R_monthly_poi_aggregation.py`
+
+**Outputs**
+- User evacuation summaries
+- Dyad-POI wide tables
+- POI-level interaction aggregation tables
+- CBG-level aggregation tables
+- POI-level residual/z-score tables
+- Regression-ready POI change tables and exploratory outputs
+
+---
+
+## R8_8_CO_POI_plot.ipynb
+
+Creates POI-level maps and exploratory visualizations for observed and counterfactual interaction changes. It loads POI attributes, user-level features, aligned dyads, and POI residual outputs to visualize important venues and flow/interaction patterns.
+
+**Inputs**
+- User-level feature tables
+- Aligned dyads: `individual_interac_allusers_{revision}_aligned.csv`
+- POI interaction/residual tables from R8_7
+- Cleaned POI polygons: `CO_pois_TP.csv`
+- Observed/random/behavior-informed comparison tables
+
+**Outputs**
+- Kepler/interactive map objects
+- POI residual visualizations
+- Flow and venue-level exploratory plots
+
+---
+
+## R8_9_CO_bonding_bridging_split copy.ipynb
+
+Develops the bonding/bridging split workflow. It computes or loads dyadic similarity measures, applies similarity-based bonding/bridging classification, computes brokerage-related structural measures, and creates split graph outputs for observed and counterfactual networks.
+
+**Inputs**
+- Dyad similarity table: `dyad_unique_pair_similarity_{revision}.csv`
+- Observed full graph pickles for Oct2021, Nov2021, Jan2022, and Feb2022
+- Random and behavior-informed graph pickles
+- Home CBG/census and dyadic distance/similarity attributes
+
+**Outputs**
+- Dyadic similarity and pairwise feature tables
+- Brokerage edge/node/network metric tables
+- Observed bonding and bridging graph pickles
+- Random/counterfactual split graph pickles
+- Split graph centrality and network metric tables
+
+---
+
+## R8_9.5_CO_bonding_bridging_split-Copy1.ipynb
+
+Applies the refined bonding/bridging split with fixed pooled pre-disaster thresholds. It uses pre-disaster similarity and structural thresholds, applies them consistently across observed and counterfactual graphs, and identifies refined bridging ties using local constraint and degree/strength filters.
+
+**Inputs**
+- Dyad similarity table: `dyad_unique_pair_similarity_{revision}.csv`
+- Observed full graph pickles for Oct2021, Nov2021, Jan2022, and Feb2022
+- Random survival graph pickles
+- Behavior-informed graph pickles where included
+- Fixed pooled pre-disaster threshold settings for similarity, local constraint, and degree/strength
+
+**Outputs**
+- Observed bonding, bridging, refined-bridging, and unclassified graph pickles
+- Counterfactual split graph pickles by run and tie type
+- Threshold-combination metadata:
+  - `combo_info_*.csv`
+- Split/refinement diagnostic tables
+- Network metric master tables
+- Node centrality master tables
+
+---
+
+## R8_10-CO_behaviorbased_interaction-splitgraphs.ipynb
+
+Extends the behavior-informed counterfactual workflow to split graph types. It constructs or loads behavior-informed counterfactual networks and evaluates bonding, bridging, refined-bridging, and unclassified versions for comparison with observed split graphs.
+
+**Inputs**
+- Aligned dyad table: `individual_interac_allusers_{revision}_aligned.csv`
+- Behavior-informed yhat/survivor outputs
+- Observed full and split graph pickles
+- Dyad similarity/homophily tables from the bonding/bridging workflow
+- Home CBG/census and evacuation files
+- Behavior-informed graph outputs under:
+  - `boots_user_removal_weighted_yhat_count/{revision}/`
+
+**Outputs**
+- Behavior-informed counterfactual outputs by run and tie type
+- Split graph comparison tables
+- Node/network centrality tables for bonding, bridging, refined-bridging, and unclassified graph comparisons
+- POI-level or interaction-level z-score outputs where computed
