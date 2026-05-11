@@ -22,13 +22,10 @@ social-networks-github-ready/
 ├── requirements.txt
 ├── .gitignore
 ├── notebooks/
-│   ├── R11_CO_Weekly_adjacency_matrix_function_workflow.ipynb
 │   ├── R8_1-CO_Weekly_adjacency_matrix.ipynb
-│   ├── R8_1-FL_Weekly_adjacency_matrix.ipynb
 │   ├── R8_2-CO_Randomremoval_interaction.ipynb
 │   ├── R8_3-CO_Randomgraph.ipynb
 │   ├── R8_4-CO_centralities_exploration.ipynb
-│   ├── R8_4-CO_explaining_centralities.ipynb
 │   ├── R8_5-CO_behaviorbased.ipynb
 │   ├── R8_6-CO_behaviorbased_interaction.ipynb
 │   ├── R8_7_CO_poilevel_changein_connections.ipynb
@@ -47,25 +44,22 @@ social-networks-github-ready/
     └── PATH_INVENTORY.md
 ```
 
-## Detailed workflow: inputs, notebooks, outputs, and downstream use
+## Detailed workflow
 
-| Step | Notebook / script | Main inputs | Main outputs | Used by next |
+| Step | Notebook | Main inputs | Main outputs | Feeds into |
 |---:|---|---|---|---|
-| 0 | `scripts/R11_colocation_function.py` | Daily stop tables, POI polygons, home-location tables, R11 parameters | Daily user-user POI co-location adjacency JSONs: `for_AM_{date}_R11.json` | Step 1 monthly aggregation |
-| 1 | `notebooks/R8_1-CO_Weekly_adjacency_matrix.ipynb` | Cuebiq stop files under `daily_agg_to_weekly_Stops/`, cleaned third-place POIs, home CBG files, `HOME_FILE_MAP`, `WEEK_DATE_MAP` | Daily adjacency JSONs for Oct 2021, Nov 2021, Jan 2022, Feb 2022 | Monthly dyad aggregation |
-| 2 | `scripts/R_monthly_poi_aggregation.py` called from the R11 notebook | Daily `for_AM_{date}_R11.json` files | Monthly POI-weighted dyad JSONs: `PDM_Oct2021_POI_weighted_colocation_R11.json`, `PDM_Nov2021_...`, `PtDM_Jan2022_...`, `PtDM_Feb2022_...` | Graph construction |
-| 3 | `scripts/build_monthly_graphs_universal.py` called from the R11 notebook | Monthly POI-weighted dyad JSONs | NetworkX graph PKLs: `PDM_Oct2021_graph_POI_weighted_R11.pkl`, `PDM_Nov2021_...`, `PtDM_Jan2022_...`, `PtDM_Feb2022_...` | Observed network metrics, random nulls, behavior-informed nulls, split graphs |
-| 4 | `R8_2-CO_Randomremoval_interaction.ipynb` | Observed pre/post R11 graphs, user/home CBG information, survivor/removal counts | Random survival/removal counterfactual graph objects and interaction metrics | Random graph summaries and comparisons |
-| 5 | `R8_3-CO_Randomgraph.ipynb` | Observed graphs and random-removal outputs | Random graph summaries, network-level metrics, node-level metrics | Centrality exploration and null comparisons |
-| 6 | `R8_4-CO_centralities_exploration.ipynb` | Observed and counterfactual graph PKLs / metric CSVs | Centrality diagnostic tables and plots | Interpretation and model covariates |
-| 7 | `R8_4-CO_explaining_centralities.ipynb` | Node/network centrality outputs | Centrality interpretation outputs and explanatory comparisons | Reporting and later model interpretation |
-| 8 | `R8_5-CO_behaviorbased.ipynb` | User-level feature table, pre-disaster centralities, mobility features, socio-demographic attributes, observed survival/removal labels | Behavior-informed survival/removal predictions and model summaries | Behavior-informed counterfactual graph construction |
-| 9 | `R8_6-CO_behaviorbased_interaction.ipynb` | Observed R11 graphs, behavior-informed probabilities, CBG-level survivor/removal constraints | Behavior-informed counterfactual interaction networks and graph metrics | Observed vs random vs behavior-informed comparison |
-| 10 | `R8_7_CO_poilevel_changein_connections.ipynb` | Observed and counterfactual graphs, POI metadata, POI-user edge statistics | POI-level change tables, residual interaction summaries, place-level outputs | POI plots and substantive interpretation |
-| 11 | `R8_8_CO_POI_plot.ipynb` | POI-level change outputs, POI metadata, geographic layers | POI maps and POI-level figures | Manuscript / presentation figures |
-| 12 | `R8_9_CO_bonding_bridging_split copy.ipynb` | R11 observed/counterfactual graphs, dyad homophily/similarity table, structural metrics | Bonding, bridging-refined, and unclassified graph files | Split-graph comparison |
-| 13 | `R8_9.5_CO_bonding_bridging_split-Copy1.ipynb` | Outputs from the bonding/bridging split workflow | Refined split-graph thresholding outputs | Robustness / final split graph workflow |
-| 14 | `R8_10-CO_behaviorbased_interaction-splitgraphs.ipynb` | Bonding, bridging-refined, and unclassified graphs; behavior-informed counterfactual outputs | Tie-type-specific observed/random/behavior-informed network metrics and plots | Manuscript results |```
+| 1 | `R8_1-CO_Weekly_adjacency_matrix.ipynb` | Cuebiq stops + home CBG + CO_pois_TP.csv + R11_colocation_function.py | Daily for_AM JSON → monthly POI-weighted JSON → R11 graph .pkl | R8_2, R8_3, R8_4, R8_9 |
+| 2 | `R8_2-CO_Randomremoval_interaction.ipynb` | R11 graphs + dyad interactions + evacuation/home CBG data | Aligned dyads + random survivor/removal files | R8_3, R8_4 |
+| 3 | `R8_3-CO_Randomgraph.ipynb` | Observed graphs + survivor files | Random survival counterfactual graph ensemble + metrics | R8_4, R8_7, R8_10 |
+| 4 | `R8_4-CO_centralities_exploration.ipynb` | Observed and CF graph pickles | Node/network centrality summaries | R8_4 explaining, writing/figures |
+| 5 | `R8_5-CO_behaviorbased.ipynb` | User features + evacuation labels + centralities + mobility variables | Behavior-informed yhat/probability tables | R8_6, R8_10 |
+| 6 | `R8_6-CO_behaviorbased_interaction.ipynb` | Aligned dyads + yhat + home/Census files | Behavior-informed interaction/graph inputs | R8_10 |
+| 7 | `R8_9_CO_bonding_bridging_split copy.ipynb` | User features + aligned dyads + graph pickles | Dyad similarity table + bonding/bridging graph files | R8_9.5, R8_10 |
+| 8 | `R8_9.5_CO_bonding_bridging_split-Copy1.ipynb` | Dyad similarity + observed/CF graph pickles | Fixed-threshold bonding/bridging/refined/unclassified graph files | R8_10, figures |
+| 9 | `R8_10-CO_behaviorbased_interaction-splitgraphs.ipynb` | Behavior-informed CFs + split-graph definitions | Split behavior-informed CF graph ensemble + metrics | Final comparison figures/tables |
+| 10 | `R8_7_CO_poilevel_changein_connections.ipynb` | Observed/CF interactions + POIs + POI covariates + R_monthly_poi_aggregation.py | POI-level residual/change tables + regression outputs | R8_8, paper figures |
+| 11 | `R8_8_CO_POI_plot.ipynb` | POI residuals + POI polygons + aligned dyads | POI maps and visualizations | Figures/supplement |
+
 
 ## Environment
 
@@ -76,22 +70,6 @@ pip install -r requirements.txt
 ```
 
 The workflow uses Jupyter/Python packages including `pandas`, `geopandas`, `numpy`, `scipy`, `scikit-learn`, `networkx`, `matplotlib`, `seaborn`, `statsmodels`, `geopy`, `shapely`, and `keplergl`.
-
-## Suggested execution order
-
-```text
-1. notebooks/R11_CO_Weekly_adjacency_matrix_function_workflow.ipynb
-2. notebooks/R8_2-CO_Randomremoval_interaction.ipynb
-3. notebooks/R8_3-CO_Randomgraph.ipynb
-4. notebooks/R8_4-CO_centralities_exploration.ipynb
-5. notebooks/R8_4-CO_explaining_centralities.ipynb
-6. notebooks/R8_5-CO_behaviorbased.ipynb
-7. notebooks/R8_6-CO_behaviorbased_interaction.ipynb
-8. notebooks/R8_7_CO_poilevel_changein_connections.ipynb
-9. notebooks/R8_8_CO_POI_plot.ipynb
-10. notebooks/R8_9_CO_bonding_bridging_split copy.ipynb
-11. notebooks/R8_9.5_CO_bonding_bridging_split-Copy1.ipynb
-12. notebooks/R8_10-CO_behaviorbased_interaction-splitgraphs.ipynb
 
 ## License
 
