@@ -40,8 +40,11 @@ social-networks-github-ready/
 │   ├── extract_model_results.py
 │   └── plot_regression_models.py
 └── docs/
-    ├── NOTEBOOK_INDEX.md
-    └── PATH_INVENTORY.md
+|    ├── NOTEBOOK_INDEX.md
+|    └── PATH_INVENTORY.md
+└── Maps/
+    ├── POI_Stats.html
+    └── read_me_maps.tex
 ```
 
 ## Detailed workflow
@@ -60,6 +63,7 @@ social-networks-github-ready/
 | 10 | `R8_7_CO_poilevel_changein_connections.ipynb` | Observed/CF interactions + POIs + POI covariates + R_monthly_poi_aggregation.py | POI-level residual/change tables + regression outputs | R8_8, paper figures |
 | 11 | `R8_8_CO_POI_plot.ipynb` | POI residuals + POI polygons + aligned dyads | POI maps and visualizations | Figures/supplement |
 
+We provide an interactive supplementary map showing POI-level deviations between observed post-disaster visitation and counterfactual-predicted post-disaster visitation. The map is colored by $z_{\log}$, a log-adjusted standardized deviation, where negative values indicate lower-than-predicted observed post-disaster visitation and positive values indicate higher-than-predicted visitation. 
 
 ## Environment
 
