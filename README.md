@@ -85,3 +85,21 @@ Data are not included. Mobility data used in this project are proprietary Cuebiq
 ## Confidentiality and reproducibility
 
 This repository is designed for reproducible code organization, not data sharing. No raw mobility records, user identifiers, proprietary data, or sensitive derived outputs are committed.
+
+
+# Note on synthetic data and path configuration
+
+The data included in this repository are fully synthetic and are provided only to demonstrate the structure of the workflow and allow users to test the code pipeline. The original mobility data used in the study were provided by Cuebiq/Spectus under a data-use agreement and are proprietary. These real mobility records cannot be redistributed through GitHub.
+
+Because the uploaded data are synthetic and intentionally minimal, some notebook paths, date ranges, filenames, and phase labels may need to be edited before running the notebooks. In the original analysis, the notebooks were configured for the full Cuebiq/Spectus file tree, with multiple pre- and post-disaster months. The synthetic package includes only a small example subset, including synthetic stop files for two pre-disaster dates, two post-disaster dates, synthetic pre-disaster home-CBG files, and synthetic POI data.
+
+If running the notebooks with the synthetic data, users should first check and update:
+
+- base data directories;
+- `phase` names such as `pre_disaster`, `post_disaster`, `PDM`, or `PtDM`;
+- date lists and month/week mappings;
+- filenames for `stop_df_YYYYMMDD` files;
+- paths to home-CBG files;
+- paths to generated outputs such as JSON files, graph pickles, and metric tables.
+
+The synthetic data are not intended to reproduce the empirical results of the study. They are included only for code testing, demonstration, and reproducibility of the computational workflow.
