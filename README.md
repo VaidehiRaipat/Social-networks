@@ -30,8 +30,8 @@ social-networks-github-ready/
 │   ├── R8_6-CO_behaviorbased_interaction.ipynb
 │   ├── R8_7_CO_poilevel_changein_connections.ipynb
 │   ├── R8_8_CO_POI_plot.ipynb
-│   ├── R8_9_CO_bonding_bridging_split copy.ipynb
-│   ├── R8_9.5_CO_bonding_bridging_split-Copy1.ipynb
+│   ├── R8_9_helper_CO_bonding_bridging_split.ipynb
+│   ├── R8_9_CO_bonding_bridging_split-Copy1.ipynb
 │   └── R8_10-CO_behaviorbased_interaction-splitgraphs.ipynb
 ├── scripts/
 │   ├── R11_colocation_function.py
