@@ -80,14 +80,12 @@ The workflow uses Jupyter/Python packages including `pandas`, `geopandas`, `nump
 Code in this repository is released under the MIT License.
 
 Data are not included. Mobility data used in this project are proprietary Cuebiq/Spectus data and are subject to separate data-use agreements. Census, POI, and geographic boundary datasets may also be subject to their own source-specific licenses. Users must obtain all required data access permissions independently.
-```
 
 ## Confidentiality and reproducibility
 
 This repository is designed for reproducible code organization, not data sharing. No raw mobility records, user identifiers, proprietary data, or sensitive derived outputs are committed.
 
-
-# Note on synthetic data and path configuration
+## Note on synthetic data and path configuration
 
 The data included in this repository are fully synthetic and are provided only to demonstrate the structure of the workflow and allow users to test the code pipeline. The original mobility data used in the study were provided by Cuebiq/Spectus under a data-use agreement and are proprietary. These real mobility records cannot be redistributed through GitHub.
 
@@ -103,3 +101,6 @@ If running the notebooks with the synthetic data, users should first check and u
 - paths to generated outputs such as JSON files, graph pickles, and metric tables.
 
 The synthetic data are not intended to reproduce the empirical results of the study. They are included only for code testing, demonstration, and reproducibility of the computational workflow.
+
+```
+
