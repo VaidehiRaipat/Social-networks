@@ -73,7 +73,8 @@ Install core Python dependencies with:
 pip install -r requirements.txt
 ```
 
-The workflow uses Jupyter/Python packages including `pandas`, `geopandas`, `numpy`, `scipy`, `scikit-learn`, `networkx`, `matplotlib`, `seaborn`, `statsmodels`, `geopy`, `shapely`, and `keplergl`.
+The workflow uses Jupyter/Python packages including: `pandas`, `geopandas`, `numpy`, `scipy`, `scikit-learn`, `networkx`, `matplotlib`, `seaborn`, `statsmodels`, `geopy`, `shapely`, and `keplergl`.
+
 
 ## License
 
